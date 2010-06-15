@@ -75,7 +75,7 @@ from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
 
-from invenio import webinterface_handler_config as apache
+from invenio import webinterface_handler_wsgi_utils as apache
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
