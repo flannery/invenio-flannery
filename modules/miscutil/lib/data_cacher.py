@@ -76,6 +76,14 @@ class DataCacher:
         if self.timestamp_verifier() > self.timestamp:
             self.create_cache()
 
+    def recreate_cache_if_needed(self):
+        """
+        Recreate cache if needed, by verifying the cache timestamp
+        against the timestamp verifier function.
+        """
+        if self.timestamp_verifier() > self.timestamp:
+            self.create_cache()
+
 class SQLDataCacher(DataCacher):
     """
     SQLDataCacher is a cacher system, for caching single queries and
