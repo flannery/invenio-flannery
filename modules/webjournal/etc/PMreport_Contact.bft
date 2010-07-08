@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>CERN Bulletin - Contact</title>
+
+<meta name="robots" content="noindex,nofollow" />
+<link href="<BFE_SERVER_INFO var="weburl" />img/webjournal_CERNBulletin/webjournal_CERNBulletin_screen.css" rel="stylesheet" type="text/css" />
+</head>
+<body id="<BFE_OBJECTLANGUAGE />">
+<div id="container">
+
+  <div id="top">
+    <div id="topbanner">
+
+      <div id="services"> <a href="http://bulletin.cern.ch<BFE_OBJECTLANGUAGE prefix='?ln='/>"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="home" /></a> | <a href="<BFE_SERVER_INFO var="weburl" />journal/search?name=CERNBulletin&amp;ln=<BFE_OBJECTLANGUAGE />"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="archives" /></a> | <a href="<BFE_SERVER_INFO var="weburl" />journal/contact?name=CERNBulletin&amp;ln=<BFE_OBJECTLANGUAGE />"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="contact" /></a>
+| <a href="http://listboxservices.web.cern.ch/listboxservices/simba2/free/subscription.aspx?list=bulletin-alert-<BFE_OBJECTLANGUAGE letters="3" filter='yes'/>"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="signup" /></a>
+| <a href="http://cern.ch"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="cernhome" /></a><br />
+
+        <form method="get" action="http://cdsweb.cern.ch/search" style="display:inline; ">
+            <input name="p" type="text" size="20" />
+            <input type="hidden" name="cc" value="Weekly Bulletin" />
+            &nbsp;
+
+            <input name="submit" type="submit" style="font-size:10px" value="<BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="search" />" />
+        </form>
+      <BFE_WEBJOURNAL_CERNBULLETINLANGUAGE />
+
+      </div>
+      <span>
+        <BFE_WEBJOURNAL_CERNBULLETINISSUENUMBER />
+      </span>
+      <div id="logo">
+        <h1>CERN - European Organization for Nuclear Research - Bulletin</h1>
+        <BFE_WEBJOURNAL_CERNBULLETINLOGO />
+      </div>
+    </div>
+    <BFE_WEBJOURNAL_CERNBULLETINMAINNAVIGATION />
+    <div id="mainphoto"></div>
+
+  </div>
+  <div class="homemiddle">
+<!--whats new-->
+    <div id="menuright">
+        <div class="rmenuitem" id="news">
+        <h2 class="rmenutext">
+            <a href="http://cdsweb.cern.ch/collection/Breaking%20News" target="_blank">
+                <BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="whats_new" />
+            </a>
+            <a href="http://cdsweb.cern.ch/search?cc=Breaking%20News&of=xr" target="_blank">
+                <img src="<BFE_SERVER_INFO var="weburl" />img/webjournal_CERNBulletin/Objects/Common/rss.png" style="border: medium none ; padding-left: 20px;"/>
+            </a>
+        </h2>
+      </div>
+      <ul class="rmenulist">
+        <BFE_WEBJOURNAL_WIDGET_ARTICLES_BY_CATEGORY />
+      </ul>
+
+<!-- For the eyes -->
+      <div class="rmenuitem" id="photo">
+          <h3 class="rmenutext"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="for_your_eyes" /></h3>
+      </div>
+      <p class="ritem">
+        <BFE_WEBJOURNAL_WIDGET_FORTHEEYES />
+      </p>
+
+<!--What's on seminars-->
+      <div class="rmenuitem" id="seminars">
+          <h3 class="rmenutext">
+            <a href="http://indico.cern.ch" target="_blank">
+                <BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="whats_on" />
+            </a>
+          </h3>
+      </div>
+      <ul class="rmenulist">
+        <BFE_WEBJOURNAL_WIDGET_SEMINARS />
+      </ul>
+        <p class="rmore"><a href="http://indico.cern.ch/tools/export.py?fid=1l7&amp;date=today&amp;days=7&amp;of=html" target="_blank" title="indico calendar of the wwk ona separate window">&gt;&gt; Seminars of the week</a></p>
+
+      <br/>
+<!--weather service-->
+      <BFE_WEBJOURNAL_WIDGET_WEATHER title_en="Under the CERN sky" title_fr="Sous le ciel du CERN" />
+
+
+<!--links-->
+      <div class="rmenuitem" id="links">
+        <h3 class="rmenutext" style="color:#000;"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="links" /></h3>
+      </div>
+      <ul class="rmenulist">
+        <li><a href="http://www.cerncourier.com">CERN Courier</a> </li>
+        <li><a href="http://echo.cern.ch/"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="link_assoc" /></a> </li>
+        <li><a href="http://press.web.cern.ch/Press/"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="link_pressoffice" /></a> </li>
+        <li><a href="http://cern.ch/hr-training/"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="link_training" /></a></li>
+        <li><a href="http://cdsweb.cern.ch/events/events.py/index?date=future&amp;categ=All&amp;order=date"><BFE_WEBJOURNAL_WIDGET_CERN_WIDGET_TITLES title="link_events" /></a></li>
+        <li><a href="http://user.web.cern.ch/user/staff_assoc/Clubs.html">Clubs</a></li>
+      </ul>
+    </div>
+
+    &nbsp;
+    <div class="homesubtext">
+      <h2><lang><en>Contact us</en><fr>Contact</fr></lang></h2>
+      <lang>
+        <en>
+          <ul>
+            <li>If you wish to publish information in the Bulletin or if you have an idea for an article, please contact:<br />
+                <a href="mailto:Bulletin-Editors@cern.ch">Bulletin-Editors@cern.ch</a></li><br />
+            <li>Official news or general information must be sent before Tuesday 12.00 to:<br />
+                <a href="mailto:Bulletin-Editors@cern.ch">Bulletin-Editors@cern.ch</a></li><br />
+            <li>If you have questions or comments about the Web site contact:<br />
+                <a href="mailto:Bulletin-Support@cern.ch">Bulletin-Support@cern.ch</a></li><br />
+          </ul>
+        </en>
+        <fr>
+          <ul>
+            <li>Si vous souhaitez publier une information dans le Bulletin ou si vous avez une id&eacute;e d'article, vous pouvez contacter :<br />
+                <a href="mailto:Bulletin-Editors@cern.ch">Bulletin-Editors@cern.ch</a></li><br />
+             <li>Les communications officielles et informations g&eacute;n&eacute;rales doivent &ecirc;tre envoy&eacute;es avant mardi 12h00 &agrave; :<br />
+                 <a href="mailto:Bulletin-Editors@cern.ch">Bulletin-Editors@cern.ch</a></li><br />
+             <li>Si vous avez des questions ou commentaires sur le site Web du Bulletin, vous pouvez contacter :<br />
+                 <a href="mailto:Bulletin-Support@cern.ch">Bulletin-Support@cern.ch</a></li><br />
+          </ul>
+        </fr>
+      </lang>
+    </div>
+    <p style="clear:both">&nbsp;</p>
+    <div id="footer">Copyright CERN 2008 - CERN Publications, DSU-CO</div>
+
+  </div>
+  <div id="bottom"> </div>
+</div>
+
+</body>
+</html>

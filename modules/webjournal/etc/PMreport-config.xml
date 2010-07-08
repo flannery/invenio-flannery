@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<webjournal name="PMreport">
+    <view>
+        <niceName>Project Managers&#8217; Report</niceName>
+        <niceURL>http://174.143.153.93</niceURL>
+        <css>
+            <screen>/img/PMreport.css</screen>
+            <print>/img/PMreport.css</print>
+        </css>
+        <format_template>
+            <index>PMreport_Index.bft</index>
+            <detailed>PMreport_Detailed.bft</detailed>
+            <search>PMreport_Search.bft</search>
+            <popup>PMreport_Popup.bft</popup>
+            <contact>PMreport_Contact.bft</contact>
+	    <meetings>PMreport_Meetings.bft</meetings>
+        </format_template>
+    </view>
+
+    <model>
+        <record><!-- or 980__a:PMREPORT or 980__a:PMREPORTDRAFT-->
+            <rule>Reports, 980__a:PMREPORTALL or 980__a:PMREPORTALLDRAFT</rule>
+            <rule>Announcements, 980__a:PMREPORTNEWS or 980__a:PMREPORTNEWSDRAFT</rule>
+        </record>
+    </model>
+
+    <controller>
+      <categories>Reports=ALL,Announcements=NEWS</categories><!-- This is used by bibformat admin_links widget to provide the correct combo value -->
+      <meetings>
+        <indico_url>http://ilcagenda.linearcollider.org/tools/export.py?date=THE_DATE&amp;days=31&amp;of=xml&amp;dc=2&amp;fid=CATEGORY</indico_url>      
+        <indico_categories>12,8</indico_categories>
+        <indico_category_names>12=Conferences;8=General Meetings</indico_category_names><!-- This is used to provide the headers displayed on the meetings page.-->
+        <display_num_meetings>5</display_num_meetings>
+        <record_type>XMLMEETING</record_type>
+      </meetings>
+        <!--<xml_type>XML-MEETINGS</xml_type>-->
+        <issue_grouping>1</issue_grouping>
+	<issues_per_year>12</issues_per_year>
+	<hide_unreleased_issues>all</hide_unreleased_issues>
+        <marc_tags>
+            <issue_number>773__n</issue_number>
+	    <order_number>773__c</order_number>
+        </marc_tags>
+	<alert_sender>flannery@gmail.com</alert_sender>
+	<alert_recipients>maura@ilcgde.org, flannery@fnal.gov</alert_recipients>
+	<languages>en</languages>
+	<submission>
+            <doctype>PMREPORT</doctype>
+	    <identifier_element>PMREPORT_RN</identifier_element>
+            <identifier_field>037__a</identifier_field>
+	</submission>
+        <first_issue>01/2009</first_issue>
+<!--        <first_issue>03/2010</first_issue>-->
+        <draft_keyword>DRAFT</draft_keyword>
+    </controller>
+</webjournal>
+

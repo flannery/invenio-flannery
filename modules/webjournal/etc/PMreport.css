@@ -1,0 +1,427 @@
+@charset "UTF-8";
+img{
+	border: 0px;
+}
+body{
+	font-family: helvetica, arial, sans-serif;
+	font-size: 0.8em;
+	margin: 0 0 20px 0;
+	background: #000060;
+}
+#container {
+	padding: 0pt;
+	width: 940px;
+	margin-right: auto;
+	margin-left: auto;
+	background-color: #ffffff;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	border-top-width: 0px;
+	border-right-width: 0px;
+	border-bottom-width: 0px;
+	border-left-width: 0px;
+	min-height: 800px;
+}
+#headerBox {
+	background: url("http://www.linearcollider.org/tmpl_images_v3/bg_top.jpg") no-repeat scroll 0 0 transparent;
+	text-align: right;
+	height: 95px;
+}
+#bottom{
+	height: 10px;
+	width: 960px;
+	margin: 0 auto;
+	clear: both;
+}
+#fotter{
+	margin: 0 auto;
+	color: #bbbbff;
+	text-align: right;
+	width: 960px;
+}
+#fotter div{
+	margin: 0px 20px;
+}
+#fotter a, #fotter a:visited{
+	color: #bbbbff !important;
+	text-decoration: underline !important;
+}
+#fotter a:hover{
+	text-decoration: none !important;
+}
+#imprint {
+	visibility: hidden;
+	position: absolute;
+}
+
+span.meetingCategory{
+    display:block;
+    color: #666;
+    margin-left: 10px;
+    font-size: .9em;
+}
+
+h1.journalTitle {
+	margin: 22px 20px 0;
+	font-weight: lighter;
+}
+.nav_link {
+	background: #B6B6B6;
+	margin: 0px;
+	padding: 0px;
+	overflow: auto;
+	position: absolute; /* For Search bar*/
+	width: 928px;
+}
+.nav_link li {
+	background: #FFF;
+	list-style: none;
+	display: block;
+	float: left;
+}
+.nav_link a, .nav_link a:visited {
+	background: #DBEA5E;
+	display: block;
+	border: 1px solid #b6b6b6;
+	padding: 4px 11px;
+	margin-right: 1px;
+	font-weight: bold;
+	color: #2C336C !important;
+}
+.nav_link a.selectedNavigationPage {
+	background: #B6D04F;
+}
+h2.leftColumnHeader {
+	border-bottom: 1px solid #666;
+	font-size: 120%;
+	font-variant: small-caps;
+	margin: 5px 0 5px;
+	color: #666;
+}
+#leftColumn {
+	border-right: 1px solid #666;
+	font-size: small;
+	padding-right: 10px;
+	width: 230px;
+	padding-top: 5px;
+}
+#leftColumn  ul {
+	padding-left: 0px;
+	margin: 0px;
+	list-style: none;
+}
+#leftColumn li {
+	margin-top: 5px;
+}
+.leftBox{
+	margin-bottom: 8px;
+
+}
+.leftBoxContent{
+	margin-left: 10px;
+}
+.leftBoxContent dl{
+	margin: 5px 0 0;
+	padding: 0px;
+}
+.leftBoxContent dt{
+	font-weight: bold;
+	color: #555;
+}
+.leftBoxContent dd{
+	padding-left: 0px;
+	margin-left: 0px;		
+	margin-top: 3px;
+}
+#rightColumn{
+	padding-left: 10px;
+	padding-top: 5px;
+	padding-right: 2px;
+}
+#rightColumn ul{
+	margin: 5px 0 0 5px;
+	padding: 0;
+}
+#rightColumn li{
+	list-style: none;
+	padding-bottom: 3px;
+}
+.related_articles{
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 10px;
+}
+.related_articles strong{
+    border-bottom: 1px solid #ccc;
+    display: block;
+    font-size: 120%;
+    color: #666;
+    padding-left: 5px;
+}
+.related_articles ul{margin: 0 !important; padding: 0 !important;}
+.related_articles li{margin-top: 5px; padding-bottom: 0 !important;}
+.related_articles li span{float: right; color: #888;}
+.related_articles li a{margin-right: 10px;}
+#search {
+	margin-right: 5px;
+	padding: 1px;
+	float: right;
+	position: relative;
+}
+#webjournal .header {
+	font-size: small;
+	font-weight: lighter;
+	color: #333333;
+	margin-right: 20px
+}
+#webjournal .footer {
+	font-size: x-small;
+	color: #333333;
+	text-align: center;
+}
+.topic_class{
+	display: block; 
+	font-size: 74%;
+}
+#article_list{
+	margin: 0 0 5px 0 !important;
+	padding: 0px;
+	background: url("http://www.linearcollider.org/images/ccc_pmr.png") repeat-y scroll 331px top transparent;
+}
+#article_list li{
+	float: left;
+	width: 315px;
+	margin-left: 31px;
+}
+#article_list li.left{
+	margin: 0 !important; 
+	clear: both;
+}
+/* Images in detailed articles */
+.imageScale, .imageScale img {
+        width:280px;
+}
+/* First article image on index page.
+We cannot reuse the phl, ph and phr classes to draw the border, or the
+rendering of the index page on the HTML alert will fail*/
+.featuredImageScale, .featuredImageScale img {
+        width:300px; /*Also check bfe_webjournal_MainArticleOverview, parameter 'image_px_width' */
+        border:1px solid #999999;
+        margin-bottom:6px;
+        margin-right:12px;
+        margin-top:0.2em;
+        padding:2px;
+}
+/* Other articles images on index page.
+We cannot reuse the phl, ph and phr classes to draw the border, or the
+rendering of the index page on the HTML alert will fail */
+.featuredImageScaleSmall, .featuredImageScaleSmall img {
+        width:200px; /*Also check bfe_webjournal_MainArticleOverview, parameter 'small_image_px_width' */
+        border:1px solid #999999;
+        margin-bottom:6px;
+        margin-right:12px;
+        margin-top:0.2em;
+        padding:2px;
+}
+#webjournal a {
+        color: #23336c;
+	text-decoration: none;
+}
+#webjournal a:visited{
+	color: #1A386E;
+	text-decoration: none;
+}
+#webjournal a:hover {
+	color: #809000;
+	text-decoration: underline;
+}
+.contentBox {
+	padding: 0 5px;
+}
+#footerBox2 {
+	height: 70px;
+	background-position: left top;
+	padding-top: 10px;
+	padding-right: 20px;
+	padding-left: 20px;
+	padding-bottom: 0px;
+	text-align: center;
+}
+.articleTitle {
+	margin-bottom: 5px;
+	margin-top: 10px
+	margin-bottom: 5px;;
+	text-align: left;
+}
+h2 {
+        font-size: 150%;
+	margin: 5px 0;
+	color: #555;
+}
+h3 {
+        font-size: 120%;
+	margin: 5px 0;
+	color: #555;
+}
+div.new, h3.new, h2.new {
+        background:transparent url(journal_new.png) no-repeat scroll left top;
+        padding-left:25px;
+}
+.articleBody {
+	text-align: justify;
+	margin-bottom: 5px;
+}
+.articleBody a{
+	font-weight: bold; 
+}
+.articleHeader {
+        clear:both;
+        font-size:100%;
+        font-weight:600;
+        margin-bottom:4px;
+        margin-top:0pt;
+        display: block;
+}
+#articles tr:first-child .article{
+	border-top: 0px;
+}
+.article{
+	padding-bottom: 6px;
+	border-top: 1px solid #ccc;
+}
+.article h2{
+	margin-top: 0px;
+	font-size: 150%;
+}
+.article h3{
+	margin-top: 6px;
+	font-size: 130%;
+}
+.subNavigationMenuItem {
+	font-size: small;
+	font-weight: lighter;
+	color: #333333;
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #999999;
+	margin-top: 5px;
+	padding-bottom: 2px;
+}
+.readMore a{
+	font-size: small;
+	text-decoration: none;
+}
+.selectedNavigationPage {
+	/*background-color: #CCCCCC;*/
+}
+a.selectedNavigationPage:hover {
+	text-decoration:none;
+}
+
+/* Centered container for image + caption */
+.phwithcaption {
+        width:280px;
+        margin:auto;
+        border:1px solid #999;
+        background-color:#FFF;
+        clear:both;
+        font-size:80%;
+        color:#555;
+        padding:2px;
+        text-align:center;
+}
+/* Left-aligned container for image + caption */
+.phlwithcaption {
+        background-color:#FFFFFF;
+        border:1px solid #999999;
+        clear:left;
+        color:#555555;
+        float:left;
+        font-size:80%;
+        margin-right:24px;
+        max-width:280px;
+        padding:2px;
+}
+/* Right-aligned container for image + caption */
+.phrwithcaption {
+        background-color:#FFFFFF;
+        border:1px solid #999999;
+        color:#555555;
+        float:right;
+        font-size:80%;
+        margin-left:24px;
+        margin-top:24px;
+        max-width:280px;
+        padding:2px;
+        display:block;
+}
+/* Centered container for image without caption */
+.ph {
+        background-color:#FFFFFF;
+        border:1px solid #999999;
+        margin-bottom:3px;
+        margin-top:6px;
+        padding:2px;
+}
+/* Left-aligned container for image without caption */
+.phl {
+       background-color:#FFFFFF;
+       border:1px solid #999999;
+       clear:left;
+       float:left;
+       margin-bottom:6px;
+       margin-right:12px;
+       margin-top:0.2em;
+       padding:2px;
+}
+/* Right-aligned container for image without caption */
+.phr {
+        background-color:#FFFFFF;
+        border:1px solid #999999;
+        clear:right;
+        float:right;
+        margin-bottom:6px;
+        margin-left:12px;
+        margin-top:0.2em;
+        padding:2px;
+}
+.caption {
+        color:#555555;
+        font-size:70%;
+}
+ul.whatsNew {
+        line-height:1.2em;
+        list-style-position:inside;
+        list-style-type:none;
+        font-weight:700;
+}
+ul.whatsNew li {
+        margin-bottom: 15px
+}
+ul.whatsNewItem {
+        list-style-image:none;
+        list-style-position:inside;
+        list-style-type:circle;
+        font-weight:normal;
+}
+ul.whatsNewItem li {
+        margin-bottom: 0px
+}
+a.rssLink{
+        font-size:small;
+	background: url("http://linearcollider.org/images/rss.png") no-repeat scroll left top transparent;
+	padding-left: 20px;
+}
+/* CLEAR FIX */
+.clear:after {
+content:".";
+display:block;
+height:0;
+clear:both;
+visibility:hidden;
+}
+.clearfix {display:block;}

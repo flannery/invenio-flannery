@@ -18,11 +18,16 @@
 etcdir = $(sysconfdir)/bibformat/format_templates/webjournal
 webdir = $(localstatedir)/www/img
 confdir = $(sysconfdir)/webjournal/AtlantisTimes
+pmrepconfdir = $(sysconfdir)/webjournal/PMreport
 
 etc_DATA = AtlantisTimes_Detailed.bft AtlantisTimes_Index.bft \
-	   AtlantisTimes_Search.bft
-web_DATA = AtlantisTimes.css
+	   AtlantisTimes_Search.bft \
+           PMreport_Detailed.bft PMreport_Index.bft \
+           PMreport_Search.bft PMreport_Meetingss.bft \
+           PMreport_Contact.bft
+web_DATA = AtlantisTimes.css PMreport.css
 conf_DATA = AtlantisTimes-config.xml
+pmrepconf_DATA = PMreport-config.xml
 
 EXTRA_DIST = $(etc_DATA) $(web_DATA) $(conf_DATA)
 
