@@ -2745,7 +2745,8 @@ class BibDocFile:
                 if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
                 stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
-                raise apache.SERVER_RETURN, apache.DONE
+#                raise apache.SERVER_RETURN, apache.DONE
+                raise apache.SERVER_RETURN
             else:
                 req.status = apache.HTTP_NOT_FOUND
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
