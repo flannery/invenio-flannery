@@ -24,7 +24,7 @@
 <td class="contentBox">
 	<div id="navigationMenu">
 	<ul class="nav_link">
-                <BFE_WEBJOURNAL_MAIN_NAVIGATION category_prefix="<li>" category_suffix="</li>" separator=""/>
+                <BFE_WEBJOURNAL_MAIN_NAVIGATION_PMREPORT category_prefix="<li>" category_suffix="</li>" separator=""/>
         </ul>
         <form id="search" name="search" method="get" action="<BFE_SERVER_INFO var='CFG_SITE_URL'/>search/">
             <nobr><input type="text" name="p" id="searchField" />
