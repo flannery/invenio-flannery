@@ -15,7 +15,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = widgets elements functions
+SUBDIRS = functions widgets elements
 
 pylibdir = $(libdir)/python/invenio
 pylib_DATA = webjournal_webinterface.py webjournal_utils.py \

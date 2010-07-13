@@ -18,6 +18,6 @@
 pylibdir = $(libdir)/python/invenio/websubmit_functions
 pylib_DATA = Check_WebJournal_Released.py 
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) 
 
 CLEANFILES = *~ *.tmp *.pyc
