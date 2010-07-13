@@ -14,7 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-# pylint: disable=C0301
+# pylint: disable-msg=C0301
 """CDS Invenio WebJournal Administration Interface."""
 
 __revision__ = "$Id$"
@@ -24,11 +24,12 @@ import cPickle
 import re
 import os
 from urllib2 import urlopen
+from xml.dom import minidom
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable=W0622
+    # pylint: disable-msg=W0622
     from sets import Set as set
-    # pylint: enable=W0622
+    # pylint: enable-msg=W0622
 
 from invenio.errorlib import register_exception
 from invenio.config import \
@@ -38,7 +39,9 @@ from invenio.config import \
      CFG_ETCDIR, \
      CFG_CACHEDIR, \
      CFG_TMPDIR, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_BINDIR, \
+     CFG_WEBDIR
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
 from invenio.access_control_engine import acc_authorize_action
@@ -68,14 +71,19 @@ from invenio.webjournal_utils import \
      get_journal_articles, \
      get_grouped_issues, \
      get_journal_issue_grouping, \
-     get_journal_languages
+     get_journal_languages, \
+     get_xml_from_config
 from invenio.dbquery import run_sql
 from invenio.bibrecord import \
      create_record, \
      print_rec
 from invenio.bibformat import format_record
 from invenio.bibtask import task_low_level_submission
+from invenio.webjournal_config import \
+     InvenioWebJournalNoJournalOnServerError
+from invenio.search_engine import search_pattern
 import invenio.template
+
 wjt = invenio.template.load('webjournal')
 
 def getnavtrail(previous = ''):
@@ -84,6 +92,44 @@ def getnavtrail(previous = ''):
     navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
     navtrail = navtrail + previous
     return navtrail
+
+def make_journal_pdfs( journal_name, journal_issue ):
+    """
+    Generates a set of PDFs of the index pages and articles for a given journal name and issue
+
+    Parameters:
+        journal_name - the string name of the journal to generate the PDFs for
+        journal_issue - the string of the issue to generate PDFs for, of the form "02/2009"
+            This is because of the way the URLs are put together to create the articles. 
+    """
+    for issue in journal_issue:
+        journal_month = issue.split('/')[0]
+        journal_year = issue.split('/')[1]
+        #First get a list of the journal categories
+        categories = get_journal_categories( journal_name, issue )
+        #The following code should not execute if the journal name returns no categories.... This should in theory prevent random strings from being executed....
+        for category in categories:
+            command_category = CFG_BINDIR + "/wkhtmltopdf  '" + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category + "' " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + ".pdf" 
+#            err, out = commands.getstatusoutput( command_category )
+#            if err:
+#                raise StandardError, '%s: %s \n %s' % (err, out, command_category)
+            command_category = "wget --base=" + CFG_SITE_URL + " -O " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + ".html " + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category 
+#            err, out = commands.getstatusoutput( command_category )
+#            if err:
+#                raise StandardError, '%s: %s \n %s' % (err, out, command_category)
+
+            #Now get a list of all articles in that category
+            articles = get_journal_articles( journal_name, issue, category )
+            for article_group in articles:
+                for article in articles[article_group]:
+                    command_article = CFG_BINDIR + "/wkhtmltopdf  '" + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category + '/' + str(article) + "' " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + '_' + str(article) + '.pdf' 
+#                    err, out = commands.getstatusoutput( command_article )
+#                    if err:
+#                        raise StandardError, '%s: %s \n %s' % (err, out, command_article)
+                    command_article = "wget --base=" + CFG_SITE_URL + " -O " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + '_' + str(article) + ".html " + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category + '/' + str(article)
+#                    err, out = commands.getstatusoutput( command_article )
+#                    if err:
+#                        raise StandardError, '%s: %s \n %s' % (err, out, command_article)
 
 def perform_index(ln=CFG_SITE_LANG, journal_name=None, action=None, uid=None):
     """
@@ -270,6 +316,156 @@ def perform_regenerate_issue(issue,
                                                journal_name,
                                                issue)
 
+def perform_regenerate_meetings(issue,
+                             journal_name,
+                             ln=CFG_SITE_LANG):
+    """
+    This function will generate the XML record for the given journal issue
+    if one is not present, it will create one and insert it.  
+    If one (or more) already exists, it will replace the first XML 
+    record found with new data obtained from the Indico server 
+    specified in the journal XML configuration file. 
+    """ 
+    indico_url = get_xml_from_config(["controller/meetings/indico_url"], journal_name)['controller/meetings/indico_url'][0]
+    indico_categories = get_xml_from_config(["controller/meetings/indico_categories"], journal_name)['controller/meetings/indico_categories'][0]
+    display_num_meetings = get_xml_from_config(["controller/meetings/display_num_meetings"], journal_name)['controller/meetings/display_num_meetings'][0]
+    xml_doc_type = get_xml_from_config(["controller/meetings/record_type"], journal_name)['controller/meetings/record_type'][0]
+
+    xml_records = search_pattern(p='773__t:%s and 773__n:%s and 980__a:%s not 980__c:DELETED' % (journal_name, issue, xml_doc_type ) ).tolist()
+    control_field = ""
+    recid = 0
+    if len(xml_records) > 0:
+        control_field = '<controlfield tag="001">%i</controlfield>' % xml_records[0] 
+        recid = xml_records[0]
+        
+    """
+    Need to add in some code here to delete the previous records or at least set them up to be replaced....
+    """
+    dates = issue.split("/")
+    the_day = str(1)
+    the_month = str(int(dates[0]) - 1)
+    the_year = str(dates[1])
+    if the_month == str(0):
+        the_month = str(12)
+        the_year = str( int(the_year) - 1 )
+    indico_url = indico_url.replace( "THE_DATE", the_year + "-" + the_month + "-" + the_day )
+    """
+    Also would like to decide on behavior for the temp file...
+    Python's built in temp file library is one option, 
+    or keep with the convention of using the var temp directory
+    """
+
+    meeting_xml_entries = []
+    # Lets embed the category title in the XML file for the JavaScript editor. 
+    # For displaying it on the journal, we will styll grab the value from the configuration
+    # just in case it has changed
+    indico_category_names = get_xml_from_config(["controller/meetings/indico_category_names"], journal_name)['controller/meetings/indico_category_names'][0].split(';')
+    category_names = {}
+    for pair in indico_category_names:
+        category_names[pair.split('=')[0]] = pair.split('=')[1]
+
+    for category in indico_categories.split(","):
+        """ string is deprecated, but I am using it as a solution for the time being...."""
+        category_url = indico_url.replace( "CATEGORY", category )
+        try:
+            xml_from_indico = urlopen( category_url )
+        except:
+            meeting_xml_entries.append( [ "Error connectiong to %s" % category_url ] )
+            continue
+        xml_dom = minidom.parseString(xml_from_indico.read())
+        agenda_items = xml_dom.getElementsByTagName("agenda_item")
+        if agenda_items == 0:
+            continue
+        category_xml = [ '<Indico_Meetings><category_id>%s</category_id><category_name>%s</category_name>' % (category, category_names[category] ) , ]
+        for item in agenda_items:
+            category_xml.extend( [ "<meeting>", ] )
+            try:
+                start_time = item.getElementsByTagName("start_time")[0].firstChild.toxml()
+            except:
+                start_time = ""
+            category_xml.extend( ["<start_time>%s</start_time>" % start_time, ] )
+            try:
+                start_date = item.getElementsByTagName("start_date")[0].firstChild.toxml()
+            except:
+                start_date = ""
+            category_xml.extend(["<start_date>%s</start_date>" % start_date, ])
+            try:
+                end_date = item.getElementsByTagName("end_date")[0].firstChild.toxml()
+            except:
+                end_date = ""
+            category_xml.extend(["<end_date>%s</end_date>" % end_date, ])
+            try:
+                category = item.getElementsByTagName("category")[0].firstChild.toxml()
+            except:
+                category = ""
+            category_xml.extend(["<category>%s</category>" % category, ])
+            try:
+                title = item.getElementsByTagName("title")[0].firstChild.toxml()
+            except:
+                title = ""
+            category_xml.extend(["<title>%s</title>" % title, ])
+            try:
+                url = item.getElementsByTagName("agenda_url")[0].firstChild.toxml()
+            except:
+                url = "#"
+            category_xml.extend(["<url>%s</url>" % url, ])
+            try:
+                speaker = item.getElementsByTagName("speaker")[0].firstChild.toxml()
+            except:
+                speaker = ""
+            category_xml.extend(["<speaker>%s</speaker>" % speaker, ])
+            try:
+                room = item.getElementsByTagName("room")[0].firstChild.toxml()
+            except:
+                room = ""
+            category_xml.extend(["<room>%s</room>" % room, ])
+            category_xml.extend(["</meeting>", ])
+        category_xml.extend(["</Indico_Meetings>", ])
+        meeting_xml_entries.append( ''.join(i.encode('utf-8')for i in category_xml) )
+    meeting_xml_entries = ''.join( meeting_xml_entries )
+    meeting_xml_entries = "<root>" + meeting_xml_entries + "</root>"
+    """
+    Add in code here to write out the XML file for submission
+    """
+    xml_file = """
+<record>
+  %(control_field)s
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">XML-%(journal_name)s-%(issue_esc)s</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">XML Entry for %(journal_name)s Issue %(issue)s</subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="n">%(issue)s</subfield>
+    <subfield code="t">%(journal_name)s</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a"><![CDATA[%(xml_data)s]]></subfield>
+  </datafield>
+  <datafield tag="653" ind1="1" ind2=" ">
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">%(doc_type)s</subfield>
+  </datafield>
+</record>
+""" % {'control_field':control_field, 'journal_name':journal_name, 'issue':issue, 'issue_esc':issue.replace('/','_'), 'xml_data': meeting_xml_entries, 'doc_type':xml_doc_type }
+    """
+    We have all of the XML for the meetings of the month now
+    It is time to create a record for it
+    """
+    filename = "%s/xml_meetings_%s.xml" % (CFG_TMPDIR, journal_name + '_' + issue.replace('/','_'))
+    if recid != 0:
+        filename = "%s/xml_meetings_%s.xml" % (CFG_TMPDIR, recid) 
+    fptr = open( filename, "w")
+    fptr.write( xml_file )
+    fptr.close()
+    if recid == 0:
+        task_low_level_submission('bibupload', 'webjournal.XML_meetings', '-i', filename)
+    else:
+        task_low_level_submission('bibupload', 'webjournal.XML_meetings', '-r', filename)
+    return "Filename: %s <br/>Indico URL: %s <br/> Indico Categories: %s <br/> Num to display: %s <br/> XML: %s" % ( filename, indico_url, indico_categories, display_num_meetings, meeting_xml_entries )
+
 def perform_request_issue_control(journal_name, issues,
                                   action, ln=CFG_SITE_LANG):
     """
@@ -353,6 +549,7 @@ def perform_request_issue_control(journal_name, issues,
         out = wjt.tmpl_admin_control_issue_success_msg(ln,
                                                        publish_issues,
                                                        journal_name)
+        make_journal_pdfs( journal_name, publish_issues )
 
     elif action == _("Update"):
         try:
@@ -532,19 +729,19 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
 
     <controller>
         <issue_grouping>2</issue_grouping>
-    <issues_per_year>52</issues_per_year>
-    <hide_unreleased_issues>all</hide_unreleased_issues>
+	<issues_per_year>52</issues_per_year>
+	<hide_unreleased_issues>all</hide_unreleased_issues>
         <marc_tags>
             <issue_number>773__n</issue_number>
-        <order_number>773__c</order_number>
+	    <order_number>773__c</order_number>
         </marc_tags>
-    <alert_sender>%(CFG_SITE_SUPPORT_EMAIL)s</alert_sender>
-    <alert_recipients>recipients@atlantis.atl</alert_recipients>
-    <languages>en,fr</languages>
-    <submission>
+	<alert_sender>%(CFG_SITE_SUPPORT_EMAIL)s</alert_sender>
+	<alert_recipients>recipients@atlantis.atl</alert_recipients>
+	<languages>en,fr</languages>
+	<submission>
             <doctype>DEMOJRN</doctype>
             <report_number_field>DEMOJRN_RN</report_number_field>
-    </submission>
+	</submission>
         <first_issue>02/2009</first_issue>
         <draft_keyword>DRAFT</draft_keyword>
     </controller>

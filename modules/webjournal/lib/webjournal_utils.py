@@ -1361,33 +1361,42 @@ def parse_url_string(uri):
             elif arg_and_value[0] == 'name':
                 args['journal_name'] = guess_journal_name(args['ln'],
                                                           arg_and_value[1])
+            elif arg_and_value[0] == 'issue_year':
+                args['issue_year'] = arg_and_value[1]
+            elif arg_and_value[0] == 'issue_number':
+                args['issue_number'] = arg_and_value[1]
 
     arg_list = uri_middle_part.split("/")
-    if len(arg_list) > 1 and arg_list[1] not in ['search', 'contact', 'popup']:
+    if len(arg_list) > 1 and arg_list[1] not in ['search', 'contact', 'popup', 'meetings']:
         args['journal_name'] = urllib.unquote(arg_list[1])
-    elif arg_list[1] not in ['search', 'contact', 'popup']:
+    elif arg_list[1] not in ['search', 'contact', 'popup', 'meetings']:
         args['journal_name'] = guess_journal_name(args['ln'],
                                                   args['journal_name'])
 
-    cur_issue = get_current_issue(args['ln'], args['journal_name'])
-    if len(arg_list) > 2:
-        try:
-            args['issue_year'] = int(urllib.unquote(arg_list[2]))
-        except:
-            args['issue_year'] = int(cur_issue.split('/')[1])
-    else:
-        args['issue'] = cur_issue
-        args['issue_year'] = int(cur_issue.split('/')[1])
-        args['issue_number'] = int(cur_issue.split('/')[0])
-
-    if len(arg_list) > 3:
-        try:
-            args['issue_number'] = int(urllib.unquote(arg_list[3]))
-        except:
-            args['issue_number'] = int(cur_issue.split('/')[0])
+    if len(args['issue_year']) > 0 and len(args['issue_number']) > 0:
         args['issue'] = make_issue_number(args['journal_name'],
-                                          args['issue_number'],
-                                          args['issue_year'])
+                                              args['issue_number'],
+                                              args['issue_year'])
+    else:
+        cur_issue = get_current_issue(args['ln'], args['journal_name'])
+        if len(arg_list) > 2:
+            try:
+                args['issue_year'] = int(urllib.unquote(arg_list[2]))
+            except:
+                args['issue_year'] = int(cur_issue.split('/')[1])
+        else:
+            args['issue'] = cur_issue
+            args['issue_year'] = int(cur_issue.split('/')[1])
+            args['issue_number'] = int(cur_issue.split('/')[0])
+
+        if len(arg_list) > 3:
+            try:
+                args['issue_number'] = int(urllib.unquote(arg_list[3]))
+            except:
+                args['issue_number'] = int(cur_issue.split('/')[0])
+            args['issue'] = make_issue_number(args['journal_name'],
+                                              args['issue_number'],
+                                              args['issue_year'])
 
     if len(arg_list) > 4:
         args['category'] = urllib.unquote(arg_list[4])
@@ -1518,6 +1527,7 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
     """
     Gets an article view of a journal from cache.
     False if not in cache.
+    FIXME:NOT USED?
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")

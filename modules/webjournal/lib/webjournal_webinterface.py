@@ -61,7 +61,9 @@ from invenio.webjournal import \
      perform_request_article, \
      perform_request_contact, \
      perform_request_popup, \
-     perform_request_search
+     perform_request_search, \
+     perform_request_meetings
+     
 
 import invenio.template
 webjournal_templates = invenio.template.load('webjournal')
@@ -75,12 +77,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     category = None
     article_id = None
 
-    _exports = ['popup', 'search', 'contact']
+    _exports = ['popup', 'search', 'contact', 'meetings']
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs """
         if component in ['article', 'issue_control', 'edit_article', 'alert',
-                         'feature_record', 'regenerate', 'administrate'] and \
+                         'feature_record', 'regenerate', 'administrate', 'regenerate_meetings'] and \
                          CFG_CERN_SITE:
             return WebInterfaceJournalPagesLegacy(), [component]
 
@@ -245,6 +247,23 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                            verbose=argd['verbose'])
         return html
 
+    def meetings(self, req, form):
+        html = ""
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                   'ln': (str, ""),
+                                   'year': (str, ""),
+                                   'issue' : (str, ""),
+                                   'verbose': (int, 0)
+                                   })
+
+        html += perform_request_meetings(req,
+                                    argd['name'], #journal_name,
+                                    argd['year'], #journal_issue_year,
+                                    argd['issue'], #journal_issue_number,
+                                    argd['ln']
+                                    )
+        return html
+
     def contact(self, req, form):
         """
         Display contact information for the journal.
@@ -351,7 +370,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
 
     _exports = ['', 'article', 'issue_control', 'edit_article', 'alert',
-                'feature_record', 'regenerate', 'administrate']
+                'feature_record', 'regenerate', 'administrate', 'regenerate_meetings']
 
     def index(self, req, form):
         """
@@ -498,6 +517,19 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
         redirect_to_url(req, CFG_SITE_URL + \
                         '/admin/webjournal/webjournaladmin.py/regenerate?journal_name=' + \
                         argd['name'] + '&ln=' + argd['ln'] + '&issue=' + argd['issue'])
+    def regenerate_meetings(self, req, form):
+        """
+        Call the admin library function to regenerate all of the meetings of the 
+        specified month
+        """
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                   'issue': (str, ""),
+                                   'ln': (str, "")})
+
+        redirect_to_url(req, CFG_SITE_URL + \
+                        '/admin/webjournal/webjournaladmin.py/regenerate_meetings?journal_name=' + \
+                        argd['name'] + '&ln=' + argd['ln'] + '&issue=' + argd['issue'])
+
 
     def alert(self, req, form):
         """
