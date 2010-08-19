@@ -544,6 +544,7 @@ def find_topics( fieldname="" ):
 
     for item in groups:
         main_group = ET.SubElement( new_xml, "category" )
+        main_group.set( "name", item.get("value") )
         main_group.set( "title", item.get("label") )
         for opt in item.findall("option"):
             if new_xml.find( opt.get("value") ) == None:
