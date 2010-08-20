@@ -1,0 +1,56 @@
+<name>Video detailed</name>
+<description>The detailed HTML format suitable for displaying video files.</description>
+
+<BFE_TOPBANNER
+prefix='<div style="padding-left:10px;padding-right:10px">'
+suffix='</div><hr/>'/>
+
+<div style="padding-left:10px;padding-right:10px">
+<BFE_TITLE prefix="<center><big><big><strong>" separator="<br /><br />" suffix="</strong></big></big></center>" />
+
+<table border="0" style="max-width:1000px;" align="center">
+ <tr>
+  <td valign="top" align="center">
+    <script type="text/javascript" src="/js/flowplayer-3.2.2.min.js"></script>
+
+    <style type="text/css">
+    .download_movie_table {
+        border: 1px solid #555555;
+    }
+    </style>
+    <BFE_VIDEO license_key="#$e7c2c24a590bb1da88f"/>
+  </td>
+  <td valign="top" align="left">
+     <small> <BFE_AUTHORS prefix="<strong>Author(s):</strong>"
+      suffix="</small>" interactive="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
+     </small>
+      <br/>
+      <small><BFE_DATE prefix="<strong>Date: </strong>" /></small>
+
+      <BFE_PUBLISHER prefix="<small>" suffix="</small>"/>
+      <BFE_PLACE prefix="<small>" suffix="</small>"/>
+      <BFE_KEYWORDS
+      prefix="<br /><small><strong>Keyword(s): </strong></small>"
+      keyword_prefix="<small>"
+      keyword_suffix="</small>" />
+
+      <BFE_NOTES
+      note_prefix="<br /><small><strong>Note: </strong>"
+      note_suffix=" </small>"
+      suffix="<br />" />
+
+      <BFE_PUBLI_INFO prefix="<br /><br /><strong>Published in: </strong>"/>
+  </td>
+ </tr>
+</table>
+
+<p >
+      <strong>Description</strong>:
+      <BFE_ABSTRACT />
+</p>
+     <BFE_VIDEO_DOWNLOAD_LINKS table_class="download_movie_table" />
+
+
+</div>
+
+<BFE_APPEARS_IN_COLLECTIONS prefix="<p style='margin-left: 10px;'><em>The record appears in these collections:</em><br />" suffix="</p>">

@@ -26,7 +26,8 @@ pylib_DATA = bfe_webjournal_main_navigation.py \
              bfe_webjournal_widget_meetings_xml.py bfe_webjournal_widget_related_articles.py \
              bfe_webjournal_widget_articles_by_category.py bfe_webjournal_archive_PMreport.py \
              bfe_webjournal_article_admin_links_PMreport.py \
-             bfe_webjournal_main_navigation_PMreport.py
+             bfe_webjournal_main_navigation_PMreport.py bfe_webjournal_articles_overview_all.py \
+             bfe_webjournal_articles_overview_topic.py
 
 EXTRA_DIST = $(pylib_DATA)
 

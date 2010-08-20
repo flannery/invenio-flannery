@@ -24,7 +24,7 @@ etc_DATA = AtlantisTimes_Detailed.bft AtlantisTimes_Index.bft \
 	   AtlantisTimes_Search.bft \
            PMreport_Detailed.bft PMreport_Index.bft \
            PMreport_Search.bft PMreport_Meetings.bft \
-           PMreport_Contact.bft
+           PMreport_Contact.bft PMreport_All.bft
 web_DATA = AtlantisTimes.css PMreport.css
 conf_DATA = AtlantisTimes-config.xml
 pmrepconf_DATA = PMreport-config.xml

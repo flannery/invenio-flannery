@@ -56,6 +56,7 @@ from invenio.webjournal_utils import \
 from invenio.urlutils import create_html_link
 from invenio.bibdocfile import decompose_file
 from invenio.dbquery import run_sql
+from urlparse import urlparse
 
 
 def format(bfo, number_of_featured_articles="1",
@@ -101,6 +102,16 @@ def format(bfo, number_of_featured_articles="1",
     @param image_alignment: 'left', 'center' or 'right'. To help rendering in Outlook.
     @param topic_class: the class to apply to the span for the topic.
     """
+    # Check to see if there are any special arguments sent to us
+    # like a subcategory to display articles from
+    url_params = urlparse( bfo.user_info['uri'] )[4]
+    params = dict([part.split('=') for part in url_params.split('&') \
+                           if len(part.split('=')) == 2])
+    subcategory = ""
+    if params.has_key('subcategory'):
+        subcategory = params['subcategory'].lower()
+#    return subcategory
+
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]
     this_issue_number = args["issue"]
@@ -143,7 +154,8 @@ def format(bfo, number_of_featured_articles="1",
         cached_html = get_index_page_from_cache(journal_name, category_name,
                                                 this_issue_number, ln)
         if cached_html:
-            return cached_html
+            nothing = True
+#            return cached_html
 
     out = '<table border="0" cellpadding="0" cellspacing="0">'
     # Get the id list
@@ -160,12 +172,14 @@ def format(bfo, number_of_featured_articles="1",
     order_numbers = ordered_articles.keys()
     order_numbers.sort()
     img_css_class = "featuredImageScale"
+#    return find_topics( sort_by_topic_field )
     topics = ET.fromstring( find_topics( sort_by_topic_field ) )
     if len(order_numbers) < 4:
         column = 0
     else:
         column = 1
-    i = 0    
+    i = 0
+#    out = ""
     for order_number in order_numbers:
         for article_id in ordered_articles[order_number]:
             # A record is considered as new if its position is
@@ -187,6 +201,23 @@ def format(bfo, number_of_featured_articles="1",
                 for topic in subtopics:
                     if topic.get('name') == article_topic:
                         topic_title = subtopics.get('title')
+                        topic_value = subtopics.get('name')
+#                        out = out + "Found cat: %s<br/>" % topic_value
+
+            if len(subcategory) > 0 and subcategory.lower() != str(topic_value).lower():
+                continue
+
+            # if we are displaying records containing a subcategory
+            # then we want to display the entire text on the main page. 
+            text = ''
+            if len(subcategory) > 0:
+                if ln == "fr":
+                    text = temp_rec.field('520__a')
+                else:
+                    text = temp_rec.field('520__b')
+            else:
+            #if not article_is_new:
+                text = _get_feature_text(temp_rec, ln)
 
             title = ''
             if ln == "fr":
@@ -284,7 +315,7 @@ def format(bfo, number_of_featured_articles="1",
 
                     # Next images will be displayed smaller
                     img_css_class = "featuredImageScaleSmall"
-
+#            return out
             # Determine size of the title
             header_tag_size = '3'
             if number_of_featured_articles > 0 and \
@@ -293,11 +324,7 @@ def format(bfo, number_of_featured_articles="1",
                 header_tag_size = '2'
                 number_of_featured_articles -= 1
 
-            # Finally create the output. Two different outputs
-            # depending on if we have text to display or not
-            text = ''
-            if not article_is_new:
-                text = _get_feature_text(temp_rec, ln)
+
             # Link image to article if wanted
             if link_image_to_article.lower() == 'yes':
                 img = create_html_link(urlbase=article_link,
@@ -544,8 +571,8 @@ def find_topics( fieldname="" ):
 
     for item in groups:
         main_group = ET.SubElement( new_xml, "category" )
-        main_group.set( "name", item.get("value") )
         main_group.set( "title", item.get("label") )
+        main_group.set( "name", item.get("value") )
         for opt in item.findall("option"):
             if new_xml.find( opt.get("value") ) == None:
                 sub_group = ET.SubElement( main_group, "subcategory" )

@@ -27,7 +27,8 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   Default_HTML_references.bft Default_HTML_files.bft \
 	   Default_HTML_actions.bft Journal_HTML_detailed.bft \
 	   Journal_HTML_brief.bft \
-           Poetry_HTML_brief.bft Poetry_HTML_detailed.bft
+           Poetry_HTML_brief.bft Poetry_HTML_detailed.bft \
+           Video_HTML_brief.bft Video_HTML_detailed.bft
 
 tmpdir = $(prefix)/var/tmp
 
