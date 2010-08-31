@@ -282,6 +282,54 @@ def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def regenerate_meetings(req, journal_name="", issue="", ln=CFG_SITE_LANG):
+    """
+    Clears the cache for the given issue.
+    """
+    navtrail_previous_links = wjn.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/webjournal/webjournaladmin.py">WebJournal Admin</a> &gt; <a class="navtrail" href="%s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%s">%s</a>' % (CFG_SITE_URL, CFG_SITE_URL, journal_name, journal_name))
+
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return error_page(req)
+
+    try:
+        journal_name = wash_journal_name(ln, journal_name)
+        issue_number = wash_issue_number(ln, journal_name,
+                                         issue)
+
+    except InvenioWebJournalNoJournalOnServerError, e:
+        register_exception(req=req)
+        return e.user_box()
+    except InvenioWebJournalNoNameError, e:
+        register_exception(req=req)
+        return e.user_box()
+    except InvenioWebJournalNoCurrentIssueError, e:
+        register_exception(req=req)
+        return e.user_box()
+    except InvenioWebJournalIssueNumberBadlyFormedError, e:
+        register_exception(req=req)
+        return e.user_box()
+
+    auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
+                                name="%s" % journal_name)
+    if auth[0] == 0:
+        return page(title=_("Issue regenerated"),
+                    body=wjn.perform_regenerate_meetings(ln=ln,
+                                                      journal_name=journal_name,
+                                                      issue=issue),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
 def issue_control(req, journal_name="", issue=[],
                   ln=CFG_SITE_LANG, action="cfg"):
     """
