@@ -560,6 +560,7 @@ Cher Abonné,
                     </td>
                     <td class="admintdright" style="vertical-align: middle;">
                         <p><a href="%s/admin/webjournal/webjournaladmin.py/regenerate?journal_name=%s&amp;issue=%s&amp;ln=%s">&gt;regenerate</a></p>
+                        <p><a href="%s/admin/webjournal/webjournaladmin.py/regenerate_meetings?journal_name=%s&amp;issue=%s&amp;ln=%s" onclick="return confirm('Warning! \\nProceeding with this will erase any meetings already present for this issue and any changes you have made. \\nAre you SURE you want to proceed?');" >&gt;regenerate meetings</a></p>
                     </td>
                 <tr>
             ''' % ((issue==current_issue) and "background:#00FF00;" or "background:#F1F1F1;",
@@ -580,7 +581,7 @@ Cher Abonné,
                     and ('<em>not announced</em>' + (as_editor and '<br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or '')) or
                     'announced on: %s <br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;re-announce</a>' % (announced_on.strftime("%d.%m.%Y"), CFG_SITE_URL, journal_name, issue),
 
-                    CFG_SITE_URL, journal_name, issue, ln
+                    CFG_SITE_URL, journal_name, issue, ln, CFG_SITE_URL, journal_name, issue, ln
                 )
             issue_boxes.append(issue_box)
         out += '''
