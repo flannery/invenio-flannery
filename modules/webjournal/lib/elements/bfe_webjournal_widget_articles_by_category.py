@@ -31,7 +31,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_CACHEDIR, \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_ETCDIR
 from invenio.webjournal_utils import \
      parse_url_string, \
      make_journal_url, \
@@ -120,7 +121,8 @@ def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
     # 2. Build the HTML
     html_out = u''
 
-    topics_empty = find_topics( sort_by_topic_field ) 
+    topics_empty = find_topics( journal_name ) 
+    
 
     for category in journal_categories:
         if category_to_display != "":
@@ -159,11 +161,13 @@ def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
                     except:
                         continue
 
-                article_topic = temp_rec.field('65017a')
+#                article_topic = temp_rec.field('65017a')
+                article_subtopic = temp_rec.field('65027a')
+                
                 try:
                     subcats = topics.findall( "category/subcategory" )
                     for cat in subcats:
-                        if cat.get( "name" ).lower() == article_topic.lower():
+                        if cat.get( "name" ).lower() == article_subtopic.lower():
                             article = ET.SubElement( cat, "article" )
                             article.set( "title", title.decode('utf-8') )
                             article.set( "classes", ' '.join(css_classes) )
@@ -191,22 +195,24 @@ def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
                 html_out += '" class="whatsNewCategory"> <b><u> %s </u></b></a> <br/>' % category
 
             categories = topics.findall( "category" )
+            html_out = "<ul class='categories'>"
             for category_topic in categories:
                 content = ""
                 subcategories = category_topic.findall( "subcategory" )
+                content_articles = ""
                 for subcategory in subcategories:
                     if len( subcategory.getchildren() ) > 0:
-                        content_articles = ""
                         for article in subcategory.getchildren():
                             if display_titles == "no":
-                                content += '<dd class="%s" ><a href="%s" > %s  </a> </dd>' % ( article.get("classes"), article.get("link"), subcategory.get("title") )
-                            else:
-                                content += '<li class="%s" ><a href="%s" > %s  </a> </li>' % ( article.get("classes"), article.get("link"), article.get("title") )
-                if content != "":
+                                content_articles += '<li><a href="%s" > %s  </a></li>' % (article.get("link"), subcategory.get("title") )
+#                            else:
+#                                content_articles += '<li class="%s" ><a href="%s" > %s  </a> </li>' % ( article.get("classes"), article.get("link"), article.get("title") )
+                if content_articles != "":
                     if display_headers == "yes":
-                        html_out += " <dl><dt> %s </dt> %s </dl>" % ( category_topic.get("title"), content )
-                    else:
-                        html_out += "<ul> %s </ul>" % ( content )
+                        html_out += "<li><a href='%s/journal/%s/%s/%s/%s?subcategory=%s'>%s</a> <div class='nav_entry'><ul class='nav_entry'>%s</ul></div></li> " % ( CFG_SITE_URL, journal_name, issue_number.split('/')[1], issue_number.split('/')[0], category, category_topic.get("name"), category_topic.get("title"), content_articles )
+#                    else:
+#                        html_out += "<ul> %s </ul>" % ( content_articles )
+            html_out + "</ul>"
 
     if not html_out:
         html_out = '<i>' + _('There are no new articles for the moment') + '</i>'
@@ -282,20 +288,25 @@ def escape_values(bfo):
     """
     return 0
 
-def find_topics( fieldname="" ):
+def find_topics( journal_name="" ):
     """
     This function queries the database to determine the categories 
     associated with a particular submission type
     as defined in WebSubmit
     """
-    res = run_sql("SELECT fidesc FROM sbmFIELDDESC WHERE  name=%s", (fieldname,))
-    the_xml = ET.fromstring( res[0][0] )
+    # Grab the journal configuration file and build a list of what titles correspond to what abbreviations 
+    # to be used when building the layout
+    config_path = '%s/webjournal/%s/%s-config.xml' % \
+                  (CFG_ETCDIR, journal_name, journal_name)
+    config_xml = ET.parse( config_path )
+    the_xml = ET.fromstring( config_xml.find( "controller/article_categories" ).text )
     groups = the_xml.findall( "optgroup" )
     new_xml = ET.Element( "root" )
 
     for item in groups:
         main_group = ET.SubElement( new_xml, "category" )
         main_group.set( "title", item.get("label") )
+        main_group.set( "name", item.get("value") )
         for opt in item.findall("option"):
             if new_xml.find( opt.get("value") ) == None:
                 sub_group = ET.SubElement( main_group, "subcategory" )
