@@ -26,7 +26,7 @@ import os
 import urllib
 import xml.etree.ElementTree as ET
 
-import invenio.bibformat_elements.bfe_webjournal_article_body_PMreport as body_formatter
+import invenio.bibformat_elements.bfe_webjournal_article_body as body_formatter
 
 try:
     from PIL import Image
@@ -40,7 +40,8 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_TMPDIR, \
      CFG_CERN_SITE, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_ETCDIR
 from invenio.webjournal_utils import \
      cache_index_page, \
      get_index_page_from_cache, \
@@ -107,18 +108,19 @@ def format(bfo, number_of_featured_articles="1",
     @param topic_class: the class to apply to the span for the topic.
     """
     args = parse_url_string(bfo.user_info['uri'])
-    url_params = urlparse( bfo.user_info['uri'] )[4]
-    return dict([part.split('=') for part in url_params.split('&') \
-                           if len(part.split('=')) == 2])
-    bfo.user_info['uri']
+#    url_params = urlparse( bfo.user_info['uri'] )[4]
+#    return args
+#    return dict([part.split('=') for part in url_params.split('&') \
+#                           if len(part.split('=')) == 2])
+#    bfo.user_info['uri']
 #    return bfo.user_info['uri']
 #    return dumpObj( bfo.user_info['uri'] )
 #    return "HELLLO"
 #    return prettyPrint( dumpObj(args), split="<br/>" )
     journal_name = args["journal_name"]
+#    return find_topics( journal_name )
     this_issue_number = args["issue"]
 #    category_name = args["category"]
-#    category_name = "Reports"
     verbose = args["verbose"]
     ln = args["ln"]
     _ = gettext_set_language(ln)
@@ -180,7 +182,7 @@ def format(bfo, number_of_featured_articles="1",
         order_numbers = ordered_articles.keys()
         order_numbers.sort()
         img_css_class = "featuredImageScale"
-        topics = ET.fromstring( find_topics( sort_by_topic_field ) )
+        topics = ET.fromstring( find_topics( journal_name ) )
         if len(order_numbers) < 4:
             column = 0
         else:
@@ -410,20 +412,25 @@ def _get_feature_text(record, language):
 
     return header_text
 
-def find_topics( fieldname="" ):
+def find_topics( journal_name="" ):
     """
-    This function queries the database to determine the categories 
+    This function queries the WJ config file to determine the categories 
     associated with a particular submission type
     as defined in WebSubmit
     """
-    res = run_sql("SELECT fidesc FROM sbmFIELDDESC WHERE  name=%s", (fieldname,))
-    the_xml = ET.fromstring( res[0][0] )
+    # Grab the journal configuration file and build a list of what titles correspond to what abbreviations 
+    # to be used when building the layout
+    config_path = '%s/webjournal/%s/%s-config.xml' % \
+                  (CFG_ETCDIR, journal_name, journal_name)
+    config_xml = ET.parse( config_path )
+    the_xml = ET.fromstring( config_xml.find( "controller/article_categories" ).text )
     groups = the_xml.findall( "optgroup" )
     new_xml = ET.Element( "root" )
 
     for item in groups:
         main_group = ET.SubElement( new_xml, "category" )
         main_group.set( "title", item.get("label") )
+        main_group.set( "name", item.get("value") )
         for opt in item.findall("option"):
             if new_xml.find( opt.get("value") ) == None:
                 sub_group = ET.SubElement( main_group, "subcategory" )
@@ -432,228 +439,4 @@ def find_topics( fieldname="" ):
     return ET.tostring( new_xml )
 
 
-
-
-
-
-
-
-
-def printDict(di, format="%-25s %s"):
-    for (key, val) in di.items():
-        print format % (str(key)+':', val)
-
-def dumpObj(obj, maxlen=77, lindent=24, maxspew=600):
-    """Print a nicely formatted overview of an object.
-
-    The output lines will be wrapped at maxlen, with lindent of space
-    for names of attributes.  A maximum of maxspew characters will be
-    printed for each attribute value.
-
-    You can hand dumpObj any data type -- a module, class, instance,
-    new class.
-
-    Note that in reformatting for compactness the routine trashes any
-    formatting in the docstrings it prints.
-
-    Example:
-       >>> class Foo(object):
-               a = 30
-               def bar(self, b):
-                   "A silly method"
-                   return a*b
-       ... ... ... ... 
-       >>> foo = Foo()
-       >>> dumpObj(foo)
-       Instance of class 'Foo' as defined in module __main__ with id 136863308
-       Documentation string:   None
-       Built-in Methods:       __delattr__, __getattribute__, __hash__, __init__
-                               __new__, __reduce__, __repr__, __setattr__,       
-                               __str__
-       Methods:
-         bar                   "A silly method"
-       Attributes:
-         __dict__              {}
-         __weakref__           None
-         a                     30
-    """
-    
-    import types
-
-    # Formatting parameters.
-    ltab    = 2    # initial tab in front of level 2 text
-
-    # There seem to be a couple of other types; gather templates of them
-    MethodWrapperType = type(object().__hash__)
-
-    #
-    # Gather all the attributes of the object
-    #
-    objclass  = None
-    objdoc    = None
-    objmodule = '<None defined>'
-    
-    methods   = []
-    builtins  = []
-    classes   = []
-    attrs     = []
-    for slot in dir(obj):
-        attr = getattr(obj, slot)
-        if   slot == '__class__':
-            objclass = attr.__name__
-        elif slot == '__doc__':
-            objdoc = attr
-        elif slot == '__module__':
-            objmodule = attr
-        elif (isinstance(attr, types.BuiltinMethodType) or 
-              isinstance(attr, MethodWrapperType)):
-            builtins.append( slot )
-        elif (isinstance(attr, types.MethodType) or
-              isinstance(attr, types.FunctionType)):
-            methods.append( (slot, attr) )
-        elif isinstance(attr, types.TypeType):
-            classes.append( (slot, attr) )
-        else:
-            attrs.append( (slot, attr) )
-
-    #
-    # Organize them
-    #
-    methods.sort()
-    builtins.sort()
-    classes.sort()
-    attrs.sort()
-
-    #
-    # Print a readable summary of those attributes
-    #
-    normalwidths = [lindent, maxlen - lindent]
-    tabbedwidths = [ltab, lindent-ltab, maxlen - lindent - ltab]
-
-    def truncstring(s, maxlen):
-        if len(s) > maxlen:
-            return s[0:maxlen] + ' ...(%d more chars)...' % (len(s) - maxlen)
-        else:
-            return s
-
-    # Summary of introspection attributes
-    if objclass == '':
-        objclass = type(obj).__name__
-    intro = "Instance of class '%s' as defined in module %s with id %d" % \
-            (objclass, objmodule, id(obj))
-    print '\n'.join(prettyPrint(intro, maxlen))
-
-    # Object's Docstring
-    if objdoc is None:
-        objdoc = str(objdoc)
-    else:
-        objdoc = ('"""' + objdoc.strip()  + '"""')
-    print
-    print prettyPrintCols( ('Documentation string:',
-                            truncstring(objdoc, maxspew)),
-                          normalwidths, ' ')
-
-    # Built-in methods
-    if builtins:
-        bi_str   = delchars(str(builtins), "[']") or str(None)
-        print
-        print prettyPrintCols( ('Built-in Methods:',
-                                truncstring(bi_str, maxspew)),
-                              normalwidths, ', ')
-        
-    # Classes
-    if classes:
-        print
-        print 'Classes:'
-    for (classname, classtype) in classes:
-        classdoc = getattr(classtype, '__doc__', None) or '<No documentation>'
-        print prettyPrintCols( ('',
-                                classname,
-                                truncstring(classdoc, maxspew)),
-                              tabbedwidths, ' ')
-
-    # User methods
-    if methods:
-        print
-        print 'Methods:'
-    for (methodname, method) in methods:
-        methoddoc = getattr(method, '__doc__', None) or '<No documentation>'
-        print prettyPrintCols( ('',
-                                methodname,
-                                truncstring(methoddoc, maxspew)),
-                              tabbedwidths, ' ')
-
-    # Attributes
-    if attrs:
-        print
-        print 'Attributes:'
-    for (attr, val) in attrs:
-        print prettyPrintCols( ('',
-                                attr,
-                                truncstring(str(val), maxspew)),
-                              tabbedwidths, ' ')
-
-def prettyPrintCols(strings, widths, split=' '):
-    """Pretty prints text in colums, with each string breaking at
-    split according to prettyPrint.  margins gives the corresponding
-    right breaking point."""
-
-    assert len(strings) == len(widths)
-
-    strings = map(nukenewlines, strings)
-
-    # pretty print each column
-    cols = [''] * len(strings)
-    for i in range(len(strings)):
-        cols[i] = prettyPrint(strings[i], widths[i], split)
-
-    # prepare a format line
-    format = ''.join(["%%-%ds" % width for width in widths[0:-1]]) + "%s"
-
-    def formatline(*cols):
-        return format % tuple(map(lambda s: (s or ''), cols))
-
-    # generate the formatted text
-    return '\n'.join(map(formatline, *cols))
-
-def prettyPrint(string, maxlen=75, split=' '):
-    """Pretty prints the given string to break at an occurrence of
-    split where necessary to avoid lines longer than maxlen.
-
-    This will overflow the line if no convenient occurrence of split
-    is found"""
-
-    # Tack on the splitting character to guarantee a final match
-    string += split
-    
-    lines   = []
-    oldeol  = 0
-    eol     = 0
-    while not (eol == -1 or eol == len(string)-1):
-        eol = string.rfind(split, oldeol, oldeol+maxlen+len(split))
-        lines.append(string[oldeol:eol])
-        oldeol = eol + len(split)
-
-    return lines
-
-def nukenewlines(string):
-    """Strip newlines and any trailing/following whitespace; rejoin
-    with a single space where the newlines were.
-    
-    Bug: This routine will completely butcher any whitespace-formatted
-    text."""
-    
-    if not string: return ''
-    lines = string.splitlines()
-    return ' '.join( [line.strip() for line in lines] )
-    
-def delchars(str, chars):
-    """Returns a string for which all occurrences of characters in
-    chars have been removed."""
-
-    # Translate demands a mapping string of 256 characters;
-    # whip up a string that will leave all characters unmolested.
-    identity = ''.join([chr(x) for x in range(256)])
-
-    return str.translate(identity, chars)
-
+#print format( "PMreport" )

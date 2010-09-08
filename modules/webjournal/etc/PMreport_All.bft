@@ -20,22 +20,9 @@
   </tr>
 
   <tr id="contentRow"><td class="contentBox">
-<!--    <table width="100%" border="0" cellpadding="0">
-      <tr>
-        <td valign="top" id="leftColumn">
-	  <div id="Reports"><BFE_WEBJOURNAL_WIDGET_ARTICLES_BY_CATEGORY prefix='<div class="leftBox"><h2 class="leftColumnHeader">Reports</h2><div class="leftBoxContent">' suffix='</div></div>' latest_issue_only='no' newest_articles_only='no' sort_by_topic_field="PMREPORT_TOPIC1" display_titles="no" category_to_display="Reports" display_headers="yes" display_category_header="no"/></div>
-	  <div id="Announcements"><BFE_WEBJOURNAL_WIDGET_ARTICLES_BY_CATEGORY prefix='<div class="leftBox"><h2 class="leftColumnHeader">Announcements</h2><div class="leftBoxContent">' suffix='</div></div>' latest_issue_only='no' newest_articles_only='no' sort_by_topic_field="PMREPORT_TOPIC1" display_titles="yes" category_to_display="Announcements" display_headers="no" display_category_header="no"/></div>
-          <div id="Meetings_of_the_month"><BFE_WEBJOURNAL_WIDGET_MEETINGS_XML prefix='<div class="leftBox"><h2 class="leftColumnHeader">Meetings of the month</h2><div class="leftBoxContent">' suffix='</div></div>' indico_seminar_xml="http://ilcagenda.linearcollider.org/tools/export.py?fid=CATEGORY&date=THE_DATE&days=31&of=xml&dc=2" categories="8,12" show_all="false" /></div>
-	  <div  id="Picture"><BFE_WEBJOURNAL_WIDGET_FEATURERECORD prefix='<div class="leftBox"><h2 class="leftColumnHeader">Picture of the month</h2><div class="leftBoxContent">' suffix='</div></div>'/></div>
-	  <div  id="Archive"><BFE_WEBJOURNAL_ARCHIVE_PMREPORT prefix='<div class="leftBox"><h2 class="leftColumnHeader">Archives</h2><div class="leftBoxContent">' suffix='</div></div>'/></div>
-          </td>
-	<td valign="top" >-->
           <div style="margin:20px;">
             <BFE_WEBJOURNAL_ARTICLES_OVERVIEW_ALL sort_by_topic_field="PMREPORT_TOPIC1" />
           </div>
-<!--        </td>
-      </tr>
-    </table>-->
    </td>
   </tr>  
 </table>
