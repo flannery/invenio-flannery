@@ -62,7 +62,8 @@ from invenio.webjournal import \
      perform_request_contact, \
      perform_request_popup, \
      perform_request_search, \
-     perform_request_meetings
+     perform_request_meetings, \
+     perform_request_onepage
      
 
 import invenio.template
@@ -77,7 +78,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     category = None
     article_id = None
 
-    _exports = ['popup', 'search', 'contact', 'meetings']
+    _exports = ['popup', 'search', 'contact', 'meetings', 'onepage']
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs """
@@ -285,6 +286,24 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                        verbose=argd['verbose'])
 
         return html
+
+    def onepage(self, req, form):
+        html = ""
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                   'ln': (str, ""),
+                                   'year': (str, ""),
+                                   'issue' : (str, ""),
+                                   'verbose': (int, 0)
+                                   })
+        html += perform_request_onepage(req,
+                                    argd['name'], #journal_name,
+                                    argd['year'], #journal_issue_year,
+                                    argd['issue'], #journal_issue_number,
+                                    argd['ln']
+                                    )
+
+        return html
+
 
     def popup(self, req, form):
         """

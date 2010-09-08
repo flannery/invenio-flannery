@@ -223,6 +223,31 @@ def perform_request_meetings(req, journal_name, journal_issue_year, journal_issu
                                        verbose=verbosity)[0]
     return html
 
+def perform_request_onepage(req, journal_name, journal_issue_year, journal_issue_number, ln, editor=False, verbose=0):
+    try:
+        onepage_template = get_journal_template('onepage',
+                                                   journal_name,
+                                                   ln)
+    except InvenioWebJournalTemplateNotFoundError, e:
+        register_exception(req=req)
+        return e.user_box()
+
+
+    temp_marc = '''<record>
+                        <controlfield tag="001">0</controlfield>
+                    </record>'''
+    temp_marc = temp_marc.decode('utf-8').encode('utf-8')
+    # create a record and get HTML back from bibformat
+    user_info = collect_user_info(req)
+    bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc,
+                          user_info=user_info)
+    bfo.req = req
+    verbosity = 1
+
+    html = format_with_format_template(onepage_template,
+                                       bfo,
+                                       verbose=verbosity)[0]
+    return html
 
 def perform_request_popup(req, ln, journal_name, record):
     """
