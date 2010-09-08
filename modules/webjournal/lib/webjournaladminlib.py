@@ -41,7 +41,8 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_BINDIR, \
-     CFG_WEBDIR
+     CFG_WEBDIR, \
+     CFG_PATH_WKHTMLTOPDF
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
 from invenio.access_control_engine import acc_authorize_action
@@ -84,6 +85,8 @@ from invenio.webjournal_config import \
 from invenio.search_engine import search_pattern
 import invenio.template
 
+from invenio.shellutils import run_process_with_timeout
+
 wjt = invenio.template.load('webjournal')
 
 def getnavtrail(previous = ''):
@@ -93,6 +96,15 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
+class InvenioWebJournalMakePDFsError(Exception):
+    pass
+
+def execute_command(*args, **argd):
+    """Wrapper to run_process_with_timeout."""
+#    debug("Executing: %s" % (args, ))
+#    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'))
+    return stdout
+
 def make_journal_pdfs( journal_name, journal_issue ):
     """
     Generates a set of PDFs of the index pages and articles for a given journal name and issue
@@ -101,35 +113,17 @@ def make_journal_pdfs( journal_name, journal_issue ):
         journal_name - the string name of the journal to generate the PDFs for
         journal_issue - the string of the issue to generate PDFs for, of the form "02/2009"
             This is because of the way the URLs are put together to create the articles. 
+            It can be a list of issues.
     """
     for issue in journal_issue:
         journal_month = issue.split('/')[0]
         journal_year = issue.split('/')[1]
-        #First get a list of the journal categories
-        categories = get_journal_categories( journal_name, issue )
-        #The following code should not execute if the journal name returns no categories.... This should in theory prevent random strings from being executed....
-        for category in categories:
-            command_category = CFG_BINDIR + "/wkhtmltopdf  '" + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category + "' " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + ".pdf" 
-#            err, out = commands.getstatusoutput( command_category )
-#            if err:
-#                raise StandardError, '%s: %s \n %s' % (err, out, command_category)
-            command_category = "wget --base=" + CFG_SITE_URL + " -O " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + ".html " + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category 
-#            err, out = commands.getstatusoutput( command_category )
-#            if err:
-#                raise StandardError, '%s: %s \n %s' % (err, out, command_category)
-
-            #Now get a list of all articles in that category
-            articles = get_journal_articles( journal_name, issue, category )
-            for article_group in articles:
-                for article in articles[article_group]:
-                    command_article = CFG_BINDIR + "/wkhtmltopdf  '" + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category + '/' + str(article) + "' " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + '_' + str(article) + '.pdf' 
-#                    err, out = commands.getstatusoutput( command_article )
-#                    if err:
-#                        raise StandardError, '%s: %s \n %s' % (err, out, command_article)
-                    command_article = "wget --base=" + CFG_SITE_URL + " -O " + CFG_WEBDIR + "/img/webjournal_archive/" + journal_name + '_' + journal_year + '_' + journal_month + '_' + category + '_' + str(article) + ".html " + CFG_SITE_URL + '/journal/' + journal_name + '/' + journal_year + '/' + journal_month + '/' + category + '/' + str(article)
-#                    err, out = commands.getstatusoutput( command_article )
-#                    if err:
-#                        raise StandardError, '%s: %s \n %s' % (err, out, command_article)
+        url = CFG_SITE_URL + "/journal/onepage?name=%s&issue_year=%s&issue_number=%s" % ( journal_name, journal_year, journal_month )
+        filename = CFG_WEBDIR + "/img/%s_%s.pdf" % ( journal_year, journal_month ) 
+        args = (CFG_PATH_WKHTMLTOPDF, url, filename)
+        res, stdout, stderr = run_process_with_timeout( args )
+        if res != 0:
+            raise InvenioWebJournalMakePDFsError("Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr))
 
 def perform_index(ln=CFG_SITE_LANG, journal_name=None, action=None, uid=None):
     """
