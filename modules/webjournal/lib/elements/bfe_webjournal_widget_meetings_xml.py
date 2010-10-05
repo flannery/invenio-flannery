@@ -88,7 +88,7 @@ def get_issue_xml_records( journal_name, issue, config, ln ):
             meetings = category.getElementsByTagName("meeting")
             if len(meetings) < 1:
                 continue
-            full_html += "<strong>%s</strong><ul>" % category_names[category_id]
+            full_html += "<span class='meeting_category'>%s</span><ul class='meetings'>" % category_names[category_id]
             for meeting in meetings:
                 entry = "<li>"
                 try:
@@ -121,7 +121,7 @@ def get_issue_xml_records( journal_name, issue, config, ln ):
                 except:
                     url = "#"
                 if (title != ""):
-                    entry += '<strong><a href="%s">%s</a></strong>' % (url, title)
+                    entry += '<span class="meeting_title"><a href="%s">%s</a></span>' % (url, title)
                 try:
                     meeting_category = meeting.getElementsByTagName("category")[0].firstChild.toxml()
                 except:
